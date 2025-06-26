@@ -29,10 +29,17 @@ app.use("/api/books", bookRoutes);
 const commentRoutes = require("./routes/comment.routes");
 app.use("/api/comments", commentRoutes);
 
+const uploadRoutes = require("./routes/upload.routes");
+app.use("/api/upload", uploadRoutes);
+
 // Middleware de erro (opcional para customização futura)
 app.use((err, req, res, next) => {
   console.error("🚨 Error middleware:", err);
   res.status(500).json({ errorMessage: "Internal Server Error" });
 });
+
+app.use("/uploads", express.static("uploads"));
+
+
 
 module.exports = app;
