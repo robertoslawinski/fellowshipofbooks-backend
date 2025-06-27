@@ -61,9 +61,20 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// Verify token
-router.get("/verify", isAuthenticated, (req, res) => {
-  res.status(200).json(req.payload);
+// Old
+// router.get("/verify", isAuthenticated, (req, res) => {
+//   res.status(200).json(req.payload);
+// });
+  
+// Verify token  
+router.get("/verify", isAuthenticated, async (req, res) => {
+  try {
+    const user = await User.findById(req.payload._id).select("-password");
+    res.status(200).json(user);
+  } catch (err) {
+    res.status(500).json({ errorMessage: "Failed to verify user" });
+  }
 });
+
 
 module.exports = router;
