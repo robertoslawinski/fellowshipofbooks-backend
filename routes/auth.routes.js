@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User.model");
 const { isAuthenticated } = require("../middlewares/jwt.middleware");
 
-// Signup
+ 
 router.post("/signup", async (req, res) => {
   const { username, email, password } = req.body;
 
@@ -29,7 +29,7 @@ router.post("/signup", async (req, res) => {
   }
 });
 
-// Login
+ 
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -61,12 +61,7 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// Old
-// router.get("/verify", isAuthenticated, (req, res) => {
-//   res.status(200).json(req.payload);
-// });
-  
-// Verify token  
+ 
 router.get("/verify", isAuthenticated, async (req, res) => {
   try {
     const user = await User.findById(req.payload._id).select("-password");

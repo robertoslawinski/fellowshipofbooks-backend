@@ -2,25 +2,49 @@ const router = require("express").Router();
 const Comment = require("../models/Comment.model");
 const { isAuthenticated } = require("../middlewares/jwt.middleware");
 
-// Criar comentário em um livro
 router.post("/:bookId", isAuthenticated, async (req, res) => {
-  const { text } = req.body;
+  const { text, parentComment } = req.body;
   const userId = req.payload._id;
   const { bookId } = req.params;
 
   try {
-    const comment = await Comment.create({ text, user: userId, book: bookId });
-    res.status(201).json(comment);
+    const comment = await Comment.create({ text, user: userId, book: bookId, parentComment });
+    const populated = await comment.populate("user", "username avatar");
+    res.status(201).json(populated);
   } catch (err) {
     res.status(500).json({ errorMessage: "Failed to post comment" });
   }
 });
 
-// Listar comentários de um livro
+// NOVA ROTA PARA COMENTÁRIOS EM ÁRVORE
+router.get("/thread/:bookId", async (req, res) => {
+  try {
+    const comments = await Comment.find({ book: req.params.bookId })
+      .populate("user", "username avatar")
+      .sort({ createdAt: 1 });
+
+    const commentMap = {};
+    comments.forEach((c) => (commentMap[c._id] = { ...c._doc, replies: [] }));
+    const rootComments = [];
+
+    comments.forEach((c) => {
+      if (c.parentComment) {
+        commentMap[c.parentComment]?.replies.push(commentMap[c._id]);
+      } else {
+        rootComments.push(commentMap[c._id]);
+      }
+    });
+
+    res.status(200).json(rootComments);
+  } catch (err) {
+    res.status(500).json({ errorMessage: "Failed to load threaded comments" });
+  }
+});
+
 router.get("/:bookId", async (req, res) => {
   try {
     const comments = await Comment.find({ book: req.params.bookId })
-      .populate("user", "username")
+      .populate("user", "username avatar")
       .sort({ createdAt: -1 });
 
     res.status(200).json(comments);
@@ -29,7 +53,6 @@ router.get("/:bookId", async (req, res) => {
   }
 });
 
-// Editar comentário
 router.put("/:commentId", isAuthenticated, async (req, res) => {
   const { text } = req.body;
 
@@ -48,7 +71,6 @@ router.put("/:commentId", isAuthenticated, async (req, res) => {
   }
 });
 
-// Deletar comentário
 router.delete("/:commentId", isAuthenticated, async (req, res) => {
   try {
     const deleted = await Comment.findOneAndDelete({
@@ -64,7 +86,6 @@ router.delete("/:commentId", isAuthenticated, async (req, res) => {
   }
 });
 
-// Comentários de um usuário
 router.get("/user/:userId", async (req, res) => {
   try {
     const userComments = await Comment.find({ user: req.params.userId });

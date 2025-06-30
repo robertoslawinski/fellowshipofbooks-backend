@@ -8,11 +8,11 @@ const router = express.Router();
 
 const upload = multer({ storage });
 
-// Rota de upload de avatar usando Cloudinary
+//   Cloudinary
 router.post("/avatar", isAuthenticated, upload.single("avatar"), async (req, res) => {
   try {
     const userId = req.payload._id;
-    const imageUrl = req.file.path; // URL do Cloudinary
+    const imageUrl = req.file.path; // URL Cloudinary
 
     const updatedUser = await User.findByIdAndUpdate(
       userId,

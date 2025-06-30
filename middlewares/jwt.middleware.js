@@ -11,7 +11,7 @@ function isAuthenticated(req, res, next) {
 
   try {
     const payload = jwt.verify(token, process.env.TOKEN_SECRET);
-    req.payload = payload; // armazenamos o ID e username/email
+    req.payload = payload;  
     next();
   } catch (error) {
     return res.status(401).json({ errorMessage: "Invalid token" });

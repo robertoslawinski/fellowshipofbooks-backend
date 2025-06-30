@@ -3,21 +3,21 @@ const Book = require("../models/Book.model");
 const User = require("../models/User.model");
 const { isAuthenticated } = require("../middlewares/jwt.middleware");
 
-// Adicionar livro aos favoritos
+ 
 router.post("/add", isAuthenticated, async (req, res) => {
   const { googleId, title, authors, thumbnail } = req.body;
 
   try {
-    // Verifica se o livro já está no banco
+     
     let book = await Book.findOne({ googleId });
     if (!book) {
       book = await Book.create({ googleId, title, authors, thumbnail });
     }
 
-    // Atualiza o usuário
+     
     const updatedUser = await User.findByIdAndUpdate(
       req.payload._id,
-      { $addToSet: { favorites: book._id } }, // evita duplicação
+      { $addToSet: { favorites: book._id } }, 
       { new: true }
     ).populate("favorites");
 
@@ -27,7 +27,7 @@ router.post("/add", isAuthenticated, async (req, res) => {
   }
 });
 
-// Remover livro dos favoritos
+ 
 router.delete("/remove/:googleId", isAuthenticated, async (req, res) => {
   try {
     const book = await Book.findOne({ googleId: req.params.googleId });
@@ -46,7 +46,7 @@ router.delete("/remove/:googleId", isAuthenticated, async (req, res) => {
   }
 });
 
-// Listar livros favoritos do usuário
+
 router.get("/favorites", isAuthenticated, async (req, res) => {
   try {
     const user = await User.findById(req.payload._id).populate("favorites");

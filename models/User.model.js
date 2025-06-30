@@ -5,7 +5,7 @@ const userSchema = new Schema({
   email:    { type: String, required: true, unique: true },
   password: { type: String, required: true },
   favorites: [{ type: Schema.Types.ObjectId, ref: "Book" }],
-  avatar: { type: String, default: "" } // ✅ URL da imagem no Cloudinary
+  avatar: { type: String, default: "" } // Cloudinary
 });
 
 module.exports = model("User", userSchema);
