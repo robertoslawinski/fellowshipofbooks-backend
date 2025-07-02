@@ -12,7 +12,7 @@ const upload = multer({ storage });
 router.post("/avatar", isAuthenticated, upload.single("avatar"), async (req, res) => {
   try {
     const userId = req.payload._id;
-    const imageUrl = req.file.path; // URL Cloudinary
+    const imageUrl = req.file.path;  
 
     const updatedUser = await User.findByIdAndUpdate(
       userId,
