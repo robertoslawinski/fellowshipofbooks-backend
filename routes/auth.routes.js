@@ -4,7 +4,6 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User.model");
 const { isAuthenticated } = require("../middlewares/jwt.middleware");
 
- 
 router.post("/signup", async (req, res) => {
   const { username, email, password } = req.body;
 
@@ -29,7 +28,6 @@ router.post("/signup", async (req, res) => {
   }
 });
 
- 
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -57,11 +55,11 @@ router.post("/login", async (req, res) => {
 
     res.status(200).json({ authToken });
   } catch (err) {
-    res.status(500).json({ errorMessage: "Login error" });
+    console.error("🔥 LOGIN ERROR:", err);
+    res.status(500).json({ errorMessage: "Login error", details: err.message });
   }
 });
 
- 
 router.get("/verify", isAuthenticated, async (req, res) => {
   try {
     const user = await User.findById(req.payload._id).select("-password");
@@ -70,6 +68,5 @@ router.get("/verify", isAuthenticated, async (req, res) => {
     res.status(500).json({ errorMessage: "Failed to verify user" });
   }
 });
-
 
 module.exports = router;
